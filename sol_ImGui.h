@@ -1,7 +1,11 @@
+// Initial update to imgui[docking] v1.88 WIP.
+
 #pragma once
-#include "../ImGui//imgui.h"
+
+#include <imgui_docking/imgui.h>
+#include <imgui_docking/imgui_internal.h>
 #include <string>
-#include "sol.hpp"
+#include <sol/sol.hpp>
 
 namespace sol_ImGui
 {
@@ -1457,9 +1461,15 @@ namespace sol_ImGui
 	inline void EndPopup()																				{ ImGui::EndPopup(); }
 	inline void OpenPopup(const std::string& str_id)													{ ImGui::OpenPopup(str_id.c_str()); }
 	inline void OpenPopup(const std::string& str_id, int popup_flags)									{ ImGui::OpenPopup(str_id.c_str(), static_cast<ImGuiPopupFlags>(popup_flags)); }
-	inline bool OpenPopupContextItem()																	{ return ImGui::OpenPopupContextItem(); }
-	inline bool OpenPopupContextItem(const std::string& str_id)											{ return ImGui::OpenPopupContextItem(str_id.c_str()); }
-	inline bool OpenPopupContextItem(const std::string& str_id, int popup_flags)						{ return ImGui::OpenPopupContextItem(str_id.c_str(), static_cast<ImGuiPopupFlags>(popup_flags)); }
+	[[deprecated("Use OpenPopupOnItemClick instead.")]]
+	inline void OpenPopupContextItem()																	{ return ImGui::OpenPopupContextItem(); }
+	[[deprecated("Use OpenPopupOnItemClick instead.")]]
+	inline void OpenPopupContextItem(const std::string& str_id)											{ return ImGui::OpenPopupContextItem(str_id.c_str()); }
+	[[deprecated("Use OpenPopupOnItemClick instead.")]]
+	inline void OpenPopupContextItem(const std::string& str_id, int popup_flags)						{ return ImGui::OpenPopupContextItem(str_id.c_str(), static_cast<ImGuiPopupFlags>(popup_flags)); }
+	inline void OpenPopupOnItemClick() { return ImGui::OpenPopupOnItemClick(); }
+	inline void OpenPopupOnItemClick(const std::string& str_id) { return ImGui::OpenPopupOnItemClick(str_id.c_str()); }
+	inline void OpenPopupOnItemClick(const std::string& str_id, int popup_flags) { return ImGui::OpenPopupOnItemClick(str_id.c_str(), static_cast<ImGuiPopupFlags>(popup_flags)); }
 	inline void CloseCurrentPopup()																		{ ImGui::CloseCurrentPopup(); }
 	inline bool BeginPopupContextItem()																	{ return ImGui::BeginPopupContextItem(); }
 	inline bool BeginPopupContextItem(const std::string& str_id)										{ return ImGui::BeginPopupContextItem(str_id.c_str()); }
@@ -1786,31 +1796,33 @@ namespace sol_ImGui
 
 #pragma region Style
 		lua.new_enum("ImGuiStyleVar",
-			"Alpha"						, ImGuiStyleVar_Alpha,
-			"WindowPadding"				, ImGuiStyleVar_WindowPadding,
-			"WindowRounding"			, ImGuiStyleVar_WindowRounding,
-			"WindowBorderSize"			, ImGuiStyleVar_WindowBorderSize,
-			"WindowMinSize"				, ImGuiStyleVar_WindowMinSize,
-			"WindowTitleAlign"			, ImGuiStyleVar_WindowTitleAlign,
-			"ChildRounding"				, ImGuiStyleVar_ChildRounding,
-			"ChildBorderSize"			, ImGuiStyleVar_ChildBorderSize,
-			"PopupRounding"				, ImGuiStyleVar_PopupRounding,
-			"PopupBorderSize"			, ImGuiStyleVar_PopupBorderSize,
-			"FramePadding"				, ImGuiStyleVar_FramePadding,
-			"FrameRounding"				, ImGuiStyleVar_FrameRounding,
-			"FrameBorderSize"			, ImGuiStyleVar_FrameBorderSize,
-			"ItemSpacing"				, ImGuiStyleVar_ItemSpacing,
-			"ItemInnerSpacing"			, ImGuiStyleVar_ItemInnerSpacing,
-			"IndentSpacing"				, ImGuiStyleVar_IndentSpacing,
-			"ScrollbarSize"				, ImGuiStyleVar_ScrollbarSize,
-			"ScrollbarRounding"			, ImGuiStyleVar_ScrollbarRounding,
-			"GrabMinSize"				, ImGuiStyleVar_GrabMinSize,
-			"GrabRounding"				, ImGuiStyleVar_GrabRounding,
-			"TabRounding"				, ImGuiStyleVar_TabRounding,
-			"SelectableRounding"		, ImGuiStyleVar_SelectableRounding,
-			"SelectableTextAlign"		, ImGuiStyleVar_SelectableTextAlign,
-			"ButtonTextAlign"			, ImGuiStyleVar_ButtonTextAlign,
-			"COUNT"						, ImGuiStyleVar_COUNT
+			"Alpha",					ImGuiStyleVar_Alpha,               // float     Alpha
+			"DisabledAlpha",			ImGuiStyleVar_DisabledAlpha,       // float     DisabledAlpha
+			"WindowPadding",			ImGuiStyleVar_WindowPadding,       // ImVec2    WindowPadding
+			"WindowRounding",			ImGuiStyleVar_WindowRounding,      // float     WindowRounding
+			"WindowBorderSize",			ImGuiStyleVar_WindowBorderSize,    // float     WindowBorderSize
+			"WindowMinSize",			ImGuiStyleVar_WindowMinSize,       // ImVec2    WindowMinSize
+			"WindowTitleAlign",			ImGuiStyleVar_WindowTitleAlign,    // ImVec2    WindowTitleAlign
+			"ChildRounding",			ImGuiStyleVar_ChildRounding,       // float     ChildRounding
+			"ChildBorderSize",			ImGuiStyleVar_ChildBorderSize,     // float     ChildBorderSize
+			"PopupRounding",			ImGuiStyleVar_PopupRounding,       // float     PopupRounding
+			"PopupBorderSize",			ImGuiStyleVar_PopupBorderSize,     // float     PopupBorderSize
+			"FramePadding",				ImGuiStyleVar_FramePadding,        // ImVec2    FramePadding
+			"FrameRounding",			ImGuiStyleVar_FrameRounding,       // float     FrameRounding
+			"FrameBorderSize",			ImGuiStyleVar_FrameBorderSize,     // float     FrameBorderSize
+			"ItemSpacing",				ImGuiStyleVar_ItemSpacing,         // ImVec2    ItemSpacing
+			"ItemInnerSpace",			ImGuiStyleVar_ItemInnerSpacing,    // ImVec2    ItemInnerSpacing
+			"IndentSpacing",			ImGuiStyleVar_IndentSpacing,       // float     IndentSpacing
+			"CellPadding",				ImGuiStyleVar_CellPadding,         // ImVec2    CellPadding
+			"ScrollbarSize",			ImGuiStyleVar_ScrollbarSize,       // float     ScrollbarSize
+			"ScrollbarRounding",		ImGuiStyleVar_ScrollbarRounding,   // float     ScrollbarRounding
+			"GrabMinSize",				ImGuiStyleVar_GrabMinSize,         // float     GrabMinSize
+			"GrabRounding",				ImGuiStyleVar_GrabRounding,        // float     GrabRounding
+			"TabRounding",				ImGuiStyleVar_TabRounding,         // float     TabRounding
+			"ButtonTextAlign",			ImGuiStyleVar_ButtonTextAlign,     // ImVec2    ButtonTextAlign
+			"SelectableTextAlign",		ImGuiStyleVar_SelectableTextAlign, // ImVec2    SelectableTextAlign
+			"COUNT",					ImGuiStyleVar_COUNT
+
 		);
 #pragma endregion Style
 
@@ -1841,67 +1853,71 @@ namespace sol_ImGui
 
 #pragma region InputText Flags
 		lua.new_enum("ImGuiInputTextFlags",
-			"None"					, ImGuiInputTextFlags_None,
-			"CharsDecimal"			, ImGuiInputTextFlags_CharsDecimal,
-			"CharsHexadecimal"		, ImGuiInputTextFlags_CharsHexadecimal,
-			"CharsUppercase"		, ImGuiInputTextFlags_CharsUppercase,
-			"CharsNoBlank"			, ImGuiInputTextFlags_CharsNoBlank,
-			"AutoSelectAll"			, ImGuiInputTextFlags_AutoSelectAll,
-			"EnterReturnsTrue"		, ImGuiInputTextFlags_EnterReturnsTrue,
-			"CallbackCompletion"	, ImGuiInputTextFlags_CallbackCompletion,
-			"CallbackHistory"		, ImGuiInputTextFlags_CallbackHistory,
-			"CallbackAlways"		, ImGuiInputTextFlags_CallbackAlways,
-			"CallbackCharFilter"	, ImGuiInputTextFlags_CallbackCharFilter,
-			"AllowTabInput"			, ImGuiInputTextFlags_AllowTabInput,
-			"CtrlEnterForNewLine"	, ImGuiInputTextFlags_CtrlEnterForNewLine,
-			"NoHorizontalScroll"	, ImGuiInputTextFlags_NoHorizontalScroll,
-			"AlwaysInsertMode"		, ImGuiInputTextFlags_AlwaysInsertMode,
-			"ReadOnly"				, ImGuiInputTextFlags_ReadOnly,
-			"Password"				, ImGuiInputTextFlags_Password,
-			"NoUndoRedo"			, ImGuiInputTextFlags_NoUndoRedo,
-			"CharsScientific"		, ImGuiInputTextFlags_CharsScientific,
-			"CallbackResize"		, ImGuiInputTextFlags_CallbackResize,
-			"Multiline"				, ImGuiInputTextFlags_Multiline,
-			"NoMarkEdited"			, ImGuiInputTextFlags_NoMarkEdited
+			"None",					ImGuiInputTextFlags_None,
+			"CharsDecimal",			ImGuiInputTextFlags_CharsDecimal,
+			"CharsHexadecimal",		ImGuiInputTextFlags_CharsHexadecimal,
+			"CharsUppercase",		ImGuiInputTextFlags_CharsUppercase,
+			"CharsNoBlank",			ImGuiInputTextFlags_CharsNoBlank,
+			"AutoSelectAll",		ImGuiInputTextFlags_AutoSelectAll,
+			"EnterReturnsTrue",		ImGuiInputTextFlags_EnterReturnsTrue,
+			"CallbackCompletion",	ImGuiInputTextFlags_CallbackCompletion,
+			"CallbackHistory",		ImGuiInputTextFlags_CallbackHistory,
+			"CallbackAlways",		ImGuiInputTextFlags_CallbackAlways,
+			"CallbackCharFilter",	ImGuiInputTextFlags_CallbackCharFilter,
+			"AllowTabInput",		ImGuiInputTextFlags_AllowTabInput,
+			"CtrlEnterForNewLine",	ImGuiInputTextFlags_CtrlEnterForNewLine,
+			"NoHorizontalScroll",	ImGuiInputTextFlags_NoHorizontalScroll,
+			"AlwaysOverwrite",		ImGuiInputTextFlags_AlwaysOverwrite,
+			"ReadOnly",				ImGuiInputTextFlags_ReadOnly,
+			"Password",				ImGuiInputTextFlags_Password,
+			"NoUndoRedo",			ImGuiInputTextFlags_NoUndoRedo,
+			"CharsScientific",		ImGuiInputTextFlags_CharsScientific,
+			"CallbackResize",		ImGuiInputTextFlags_CallbackResize,
+			"CallbackEdit",			ImGuiInputTextFlags_CallbackEdit,
+			"Multiline",			ImGuiInputTextFlags_Multiline,
+			"NoMarkEdited",			ImGuiInputTextFlags_NoMarkEdited,
+			"MergedItem",			ImGuiInputTextFlags_MergedItem
 		);
 #pragma endregion InputText Flags
 
 #pragma region ColorEdit Flags
 		lua.new_enum("ImGuiColorEditFlags",
-			"None"					, ImGuiColorEditFlags_None,
-			"NoAlpha"				, ImGuiColorEditFlags_NoAlpha,
-			"NoPicker"				, ImGuiColorEditFlags_NoPicker,
-			"NoOptions"				, ImGuiColorEditFlags_NoOptions,
-			"NoSmallPreview"		, ImGuiColorEditFlags_NoSmallPreview,
-			"NoInputs"				, ImGuiColorEditFlags_NoInputs,
-			"NoTooltip"				, ImGuiColorEditFlags_NoTooltip,
-			"NoLabel"				, ImGuiColorEditFlags_NoLabel,
-			"NoSidePreview"			, ImGuiColorEditFlags_NoSidePreview,
-			"NoDragDrop"			, ImGuiColorEditFlags_NoDragDrop,
-			"NoBorder"				, ImGuiColorEditFlags_NoBorder,
+			"None",					ImGuiColorEditFlags_None,
+			"NoAlpha",				ImGuiColorEditFlags_NoAlpha,
+			"NoPicker",				ImGuiColorEditFlags_NoPicker,
+			"NoOptions",			ImGuiColorEditFlags_NoOptions,
+			"NoSmallPreview",		ImGuiColorEditFlags_NoSmallPreview,
+			"NoInputs",				ImGuiColorEditFlags_NoInputs,
+			"NoTooltip",			ImGuiColorEditFlags_NoTooltip,
+			"NoLabel",				ImGuiColorEditFlags_NoLabel,
+			"NoSidePreview",		ImGuiColorEditFlags_NoSidePreview,
+			"NoDragDrop",			ImGuiColorEditFlags_NoDragDrop,
+			"NoBorder",				ImGuiColorEditFlags_NoBorder,
 
-			"AlphaBar"				, ImGuiColorEditFlags_AlphaBar,
-			"AlphaPreview"			, ImGuiColorEditFlags_AlphaPreview,
-			"AlphaPreviewHalf"		, ImGuiColorEditFlags_AlphaPreviewHalf,
-			"HDR"					, ImGuiColorEditFlags_HDR,
-			"DisplayRGB"			, ImGuiColorEditFlags_DisplayRGB,
-			"DisplayHSV"			, ImGuiColorEditFlags_DisplayHSV,
-			"DisplayHex"			, ImGuiColorEditFlags_DisplayHex,
-			"Uint8"					, ImGuiColorEditFlags_Uint8,
-			"Float"					, ImGuiColorEditFlags_Float,
-			"PickerHueBar"			, ImGuiColorEditFlags_PickerHueBar,
-			"PickerHueWheel"		, ImGuiColorEditFlags_PickerHueWheel,
-			"InputRGB"				, ImGuiColorEditFlags_InputRGB,
-			"InputHSV"				, ImGuiColorEditFlags_InputHSV,
+			"AlphaBar",				ImGuiColorEditFlags_AlphaBar,
+			"AlphaPreview",			ImGuiColorEditFlags_AlphaPreview,
+			"AlphaPreviewHalf",		ImGuiColorEditFlags_AlphaPreviewHalf,
+			"HDR",					ImGuiColorEditFlags_HDR,
+			"DisplayRGB",			ImGuiColorEditFlags_DisplayRGB,
+			"DisplayHSV",			ImGuiColorEditFlags_DisplayHSV,
+			"DisplayHex",			ImGuiColorEditFlags_DisplayHex,
+			"Uint8",				ImGuiColorEditFlags_Uint8,
+			"Float",				ImGuiColorEditFlags_Float,
+			"PickerHueBar",			ImGuiColorEditFlags_PickerHueBar,
+			"PickerHueWheel",		ImGuiColorEditFlags_PickerHueWheel,
+			"InputRGB",				ImGuiColorEditFlags_InputRGB,
+			"InputHSV",				ImGuiColorEditFlags_InputHSV,
 
-			"_OptionsDefault"		, ImGuiColorEditFlags__OptionsDefault,
+			"DefaultOptions_",		ImGuiColorEditFlags_DefaultOptions_,
 
-			"_DisplayMask"			, ImGuiColorEditFlags__DisplayMask,
-			"_DataTypeMask"			, ImGuiColorEditFlags__DataTypeMask,
-			"_PickerMask"			, ImGuiColorEditFlags__PickerMask,
-			"_InputMask"			, ImGuiColorEditFlags__InputMask,
+			"DisplayMask_",			ImGuiColorEditFlags_DisplayMask_,
+			"DataTypeMask_",		ImGuiColorEditFlags_DataTypeMask_,
+			"PickerMask_",			ImGuiColorEditFlags_PickerMask_,
+			"InputMask_",			ImGuiColorEditFlags_InputMask_
 
-			"RGB"					, ImGuiColorEditFlags_RGB
+			// Obsolete names (will be removed)
+			// ImGuiColorEditFlags_RGB = ImGuiColorEditFlags_DisplayRGB, ImGuiColorEditFlags_HSV = ImGuiColorEditFlags_DisplayHSV, ImGuiColorEditFlags_HEX = ImGuiColorEditFlags_DisplayHex  // [renamed in 1.69]
+			//"RGB"					, ImGuiColorEditFlags_RGB
 		);
 #pragma endregion ColorEdit Flags
 
@@ -2600,10 +2616,16 @@ namespace sol_ImGui
 																sol::resolve<void(const std::string&)>(OpenPopup),
 																sol::resolve<void(const std::string&, int)>(OpenPopup)
 															));
+		// Deprecated, use OpenPopupOnItemClick instead.
 		ImGui.set_function("OpenPopupContextItem"			, sol::overload(
-																sol::resolve<bool()>(OpenPopupContextItem),
-																sol::resolve<bool(const std::string&)>(OpenPopupContextItem),
-																sol::resolve<bool(const std::string&, int)>(OpenPopupContextItem)
+																sol::resolve<void()>(OpenPopupContextItem),
+																sol::resolve<void(const std::string&)>(OpenPopupContextItem),
+																sol::resolve<void(const std::string&, int)>(OpenPopupContextItem)
+															));
+		ImGui.set_function("OpenPopupOnItemClick",			sol::overload(
+																sol::resolve<void()>(OpenPopupOnItemClick),
+																sol::resolve<void(const std::string&)>(OpenPopupOnItemClick),
+																sol::resolve<void(const std::string&, int)>(OpenPopupOnItemClick)
 															));
 		ImGui.set_function("CloseCurrentPopup"				, CloseCurrentPopup);
 		ImGui.set_function("BeginPopupContextItem"			, sol::overload(
