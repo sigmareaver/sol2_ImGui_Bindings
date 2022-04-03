@@ -2617,11 +2617,11 @@ namespace sol_ImGui
 																sol::resolve<void(const std::string&, int)>(OpenPopup)
 															));
 		// Deprecated, use OpenPopupOnItemClick instead.
-		ImGui.set_function("OpenPopupContextItem"			, sol::overload(
-																sol::resolve<void()>(OpenPopupContextItem),
-																sol::resolve<void(const std::string&)>(OpenPopupContextItem),
-																sol::resolve<void(const std::string&, int)>(OpenPopupContextItem)
-															));
+		//ImGui.set_function("OpenPopupContextItem"			, sol::overload(
+		//														sol::resolve<void()>(OpenPopupContextItem),
+		//														sol::resolve<void(const std::string&)>(OpenPopupContextItem),
+		//														sol::resolve<void(const std::string&, int)>(OpenPopupContextItem)
+		//													));
 		ImGui.set_function("OpenPopupOnItemClick",			sol::overload(
 																sol::resolve<void()>(OpenPopupOnItemClick),
 																sol::resolve<void(const std::string&)>(OpenPopupOnItemClick),
