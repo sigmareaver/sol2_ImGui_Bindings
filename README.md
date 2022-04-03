@@ -1,17 +1,13 @@
+Currently in the process of updating to imgui docking branch v1.88 WIP.</br>
+Please report any bugs or other issues here: https://github.com/sigmareaver/sol2_ImGui_Bindings/issues
+
 # sol2_ImGui_Bindings
 
-Welcome to the sol2 ImGui bindings.
-I spent my time making these over the last few days.
-I hope you think they are useful as there's no others to my knowledge.
-
-Enjoy! 
-
-# DEPRECATED
-Hi, just an additional note that this specific branch is deprecated and does not run with the current version. Some people have forked this and updated it, please check those as I can't maintain this.
-https://github.com/MSeys/sol2_ImGui_Bindings/network/members
+Welcome to the sol2 ImGui bindings.</br>
+Original repo by MSeys here: https://github.com/MSeys/sol2_ImGui_Bindings
 
 # Notes
-- This uses the latest sol2 version (as of July 2020), the repo is located at https://github.com/ThePhD/sol2/.
+- This uses the latest sol2 version (as of April 2022), the repo is located at https://github.com/ThePhD/sol2/.
 - These bindings are based on one of the latest version of ImGui Docking Branch. Comment what you don't need or breaks.
 - I've hid the U32 related function with a define (SOL_IMGUI_USE_COLOR_U32), if you wish to use these, define that!
 - There's also another define hidden (CUSTOM_IMGUI) which is for my own adapted imgui version with a few more enum values, ignore if you wish.
