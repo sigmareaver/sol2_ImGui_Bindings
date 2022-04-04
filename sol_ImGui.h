@@ -127,7 +127,7 @@ namespace sol_ImGui
 	inline void PushStyleVar(int idx, float valX, float valY)											{ ImGui::PushStyleVar(static_cast<ImGuiStyleVar>(idx), { valX, valY }); }
 	inline void PopStyleVar()																			{ ImGui::PopStyleVar(); }
 	inline void PopStyleVar(int count)																	{ ImGui::PopStyleVar(count); }
-	inline std::tuple<float, float, float, float> GetStyleColorVec4(int idx)							{ const auto col{ ImGui::GetStyleColorVec4(static_cast<ImGuiCol>(idx)) };	return std::make_tuple(col.x, col.y, col.z, col.w); }
+	inline std::tuple<float, float, float, float> GetStyleColorVec4(int idx)							{ const auto& col{ ImGui::GetStyleColorVec4(static_cast<ImGuiCol>(idx)) };	return std::make_tuple(col.x, col.y, col.z, col.w); }
 	inline ImFont* GetFont()																			{ return ImGui::GetFont(); }
 	inline float GetFontSize()																			{ return ImGui::GetFontSize(); }
 	inline std::tuple<float, float> GetFontTexUvWhitePixel()											{ const auto vec2{ ImGui::GetFontTexUvWhitePixel() };	return std::make_tuple(vec2.x, vec2.y); }
@@ -973,7 +973,7 @@ namespace sol_ImGui
 	inline void SliderScalarN()																																							{ /* TODO: SliderScalarN(...) ==> UNSUPPORTED */ }
 	inline std::tuple<float, bool> VSliderFloat(const std::string& label, float sizeX, float sizeY, float v, float v_min, float v_max)													{ bool used = ImGui::VSliderFloat(label.c_str(), { sizeX, sizeY }, &v, v_min, v_max); return std::make_tuple(v, used); }
 	inline std::tuple<float, bool> VSliderFloat(const std::string& label, float sizeX, float sizeY, float v, float v_min, float v_max, const std::string& format)						{ bool used = ImGui::VSliderFloat(label.c_str(), { sizeX, sizeY }, &v, v_min, v_max, format.c_str()); return std::make_tuple(v, used); }
-	inline std::tuple<float, bool> VSliderFloat(const std::string& label, float sizeX, float sizeY, float v, float v_min, float v_max, const std::string& format, float power)			{ bool used = ImGui::VSliderFloat(label.c_str(), { sizeX, sizeY }, &v, v_min, v_max, format.c_str(), power); return std::make_tuple(v, used); }
+	inline std::tuple<float, bool> VSliderFloat(const std::string& label, float sizeX, float sizeY, float v, float v_min, float v_max, const std::string& format, int flags)			{ bool used = ImGui::VSliderFloat(label.c_str(), { sizeX, sizeY }, &v, v_min, v_max, format.c_str(), static_cast<ImGuiSliderFlags>(flags)); return std::make_tuple(v, used); }
 	inline std::tuple<int, bool> VSliderInt(const std::string& label, float sizeX, float sizeY, int v, int v_min, int v_max)															{ bool used = ImGui::VSliderInt(label.c_str(), { sizeX, sizeY }, &v, v_min, v_max); return std::make_tuple(v, used); }
 	inline std::tuple<int, bool> VSliderInt(const std::string& label, float sizeX, float sizeY, int v, int v_min, int v_max, const std::string& format)									{ bool used = ImGui::VSliderInt(label.c_str(), { sizeX, sizeY }, &v, v_min, v_max, format.c_str()); return std::make_tuple(v, used); }
 	inline void VSliderScalar()																																							{ /* TODO: VSliderScalar(...) ==> UNSUPPORTED */ }
